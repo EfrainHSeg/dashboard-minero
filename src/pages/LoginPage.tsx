@@ -68,7 +68,7 @@ export default function LoginPage({ onSwitchToRegister }: LoginPageProps) {
               <TrendingUp className="text-blue-600" size={28} />
             </div>
             <span className="text-white text-2xl font-extrabold">
-              Dashboard Minero – Efrain H Segura
+              Dashboard Minero
             </span>
           </div>
         </div>
