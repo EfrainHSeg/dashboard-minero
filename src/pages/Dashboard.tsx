@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { useUserRole } from '../hooks/useUserRole';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { TrendingUp, Users, Zap, AlertTriangle, LogOut, Activity } from 'lucide-react';
+import { TrendingUp, Users, Zap, AlertTriangle, LogOut, Activity, Settings } from 'lucide-react';
+import AdminPanel from '../components/AdminPanel';
 
 // Datos de producción simulados
 const productionData = [
@@ -15,10 +17,20 @@ const productionData = [
 
 interface DashboardProps {
   userName: string;
+  userId: string;
 }
 
-export default function Dashboard({ userName }: DashboardProps) {
+export default function Dashboard({ userName, userId }: DashboardProps) {
+  console.log('Dashboard - userName:', userName);
+  console.log('Dashboard - userId:', userId);
+  
   const [loading, setLoading] = useState(false);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const { role, isAdmin, loading: roleLoading } = useUserRole(userId);
+  
+  console.log('Dashboard - role:', role);
+  console.log('Dashboard - isAdmin:', isAdmin);
+  console.log('Dashboard - roleLoading:', roleLoading);
 
   const handleLogout = async () => {
     setLoading(true);
@@ -61,6 +73,11 @@ export default function Dashboard({ userName }: DashboardProps) {
     }
   ];
 
+  // Mostrar panel de admin si está activo
+  if (showAdminPanel && isAdmin) {
+    return <AdminPanel onClose={() => setShowAdminPanel(false)} />;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -73,17 +90,38 @@ export default function Dashboard({ userName }: DashboardProps) {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Dashboard de Producción</h1>
-                <p className="text-sm text-gray-600">Bienvenido, {userName}</p>
+                <p className="text-sm text-gray-600">
+                  Bienvenido, {userName}
+                  {!roleLoading && role && (
+                    <span className={`ml-2 px-2 py-0.5 text-xs font-semibold rounded ${
+                      isAdmin ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'
+                    }`}>
+                      {isAdmin ? 'Administrador' : 'Trabajador'}
+                    </span>
+                  )}
+                </p>
               </div>
             </div>
-            <button
-              onClick={handleLogout}
-              disabled={loading}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50"
-            >
-              <LogOut size={18} />
-              Cerrar Sesión
-            </button>
+            <div className="flex items-center gap-3">
+              {/* Botón de Administración - Solo visible para admins */}
+              {isAdmin && (
+                <button
+                  onClick={() => setShowAdminPanel(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
+                >
+                  <Settings size={18} />
+                  Administración
+                </button>
+              )}
+              <button
+                onClick={handleLogout}
+                disabled={loading}
+                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50"
+              >
+                <LogOut size={18} />
+                Cerrar Sesión
+              </button>
+            </div>
           </div>
         </div>
       </header>

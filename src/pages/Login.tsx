@@ -9,9 +9,8 @@ interface LoginProps {
 export default function Login({ onLoginSuccess }: LoginProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,48 +18,23 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     setMessage(null);
 
     try {
-      if (isLogin) {
-        // Iniciar sesión
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-        if (error) {
-          if (error.message.includes('Email not confirmed')) {
-            setMessage({
-              type: 'error',
-              text: 'Debes confirmar tu correo antes de iniciar sesión. Revisa tu bandeja de entrada.'
-            });
-          } else if (error.message.includes('Invalid login credentials')) {
-            setMessage({
-              type: 'error',
-              text: 'Credenciales incorrectas. Verifica tu email y contraseña.'
-            });
-          } else {
-            setMessage({ type: 'error', text: error.message });
-          }
-        } else if (data.user) {
-          setMessage({ type: 'success', text: '¡Login exitoso! Redirigiendo...' });
-          setTimeout(() => onLoginSuccess(), 1000);
-        }
-      } else {
-        // Registrarse
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-        });
-
-        if (error) {
-          setMessage({ type: 'error', text: error.message });
-        } else if (data.user) {
+      if (error) {
+        if (error.message.includes('Invalid login credentials')) {
           setMessage({
-            type: 'success',
-            text: '¡Registro exitoso! Revisa tu correo para confirmar tu cuenta antes de iniciar sesión.'
+            type: 'error',
+            text: 'Credenciales incorrectas. Verifica tu email y contraseña.'
           });
-          setEmail('');
-          setPassword('');
+        } else {
+          setMessage({ type: 'error', text: 'Error al iniciar sesión. Intenta nuevamente.' });
         }
+      } else if (data.user) {
+        setMessage({ type: 'success', text: '¡Login exitoso! Redirigiendo...' });
+        setTimeout(() => onLoginSuccess(), 1000);
       }
     } catch (err) {
       setMessage({ type: 'error', text: 'Error inesperado. Intenta nuevamente.' });
@@ -115,7 +89,6 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                 placeholder="••••••••"
                 required
-                minLength={6}
               />
             </div>
           </div>
@@ -123,9 +96,9 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           {/* Mensajes */}
           {message && (
             <div className={`p-4 rounded-lg text-sm flex items-start gap-2 ${
-              message.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' :
-              message.type === 'error' ? 'bg-red-50 text-red-800 border border-red-200' :
-              'bg-blue-50 text-blue-800 border border-blue-200'
+              message.type === 'success' 
+                ? 'bg-green-50 text-green-800 border border-green-200' 
+                : 'bg-red-50 text-red-800 border border-red-200'
             }`}>
               <AlertCircle size={18} className="mt-0.5 flex-shrink-0" />
               <span>{message.text}</span>
@@ -144,36 +117,17 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                 Procesando...
               </span>
             ) : (
-              isLogin ? 'Iniciar Sesión' : 'Registrarse'
+              'Iniciar Sesión'
             )}
           </button>
         </form>
 
-        {/* Toggle entre Login y Registro */}
-        <div className="mt-6 text-center">
-          <button
-            onClick={() => {
-              setIsLogin(!isLogin);
-              setMessage(null);
-            }}
-            className="text-blue-600 hover:text-blue-700 hover:underline text-sm font-medium transition"
-          >
-            {isLogin ? '¿No tienes cuenta? Regístrate aquí' : '¿Ya tienes cuenta? Inicia sesión'}
-          </button>
+        {/* Nota informativa */}
+        <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <p className="text-xs text-gray-600 text-center">
+            Si necesitas acceso al sistema, contacta con el administrador para obtener tus credenciales.
+          </p>
         </div>
-
-        {/* Información adicional para registro */}
-        {!isLogin && (
-          <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <div className="flex items-start gap-2">
-              <Mail className="text-blue-600 mt-0.5 flex-shrink-0" size={18} />
-              <p className="text-xs text-blue-800">
-                <strong>Importante:</strong> Después de registrarte, recibirás un correo de confirmación. 
-                Debes hacer clic en el enlace para activar tu cuenta antes de poder iniciar sesión.
-              </p>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

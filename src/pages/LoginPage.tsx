@@ -1,15 +1,10 @@
 import { useState } from 'react';
-import { Mail, Lock, TrendingUp, AlertCircle, ArrowRight } from 'lucide-react';
-// Asegúrate de que estas rutas sean correctas en tu proyecto
+import { Mail, Lock, TrendingUp, AlertCircle } from 'lucide-react';
 import { authService } from '../services/authService'; 
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 
-interface LoginPageProps {
-  onSwitchToRegister: () => void;
-}
-
-export default function LoginPage({ onSwitchToRegister }: LoginPageProps) {
+export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -25,7 +20,6 @@ export default function LoginPage({ onSwitchToRegister }: LoginPageProps) {
     setError('');
     setSuccess('');
 
-    // Lógica simulada de login
     const result = await authService.login({ email, password });
 
     if (result.success) {
@@ -47,7 +41,7 @@ export default function LoginPage({ onSwitchToRegister }: LoginPageProps) {
     setLoading(true);
     setError('');
     setSuccess('');
-    // Lógica simulada de restablecimiento de contraseña
+    
     const r = await authService.sendReset(email);
     r.success ? setSuccess(r.message) : setError(r.message);
     setLoading(false);
@@ -59,7 +53,6 @@ export default function LoginPage({ onSwitchToRegister }: LoginPageProps) {
       {/* Lado izquierdo - Branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 to-blue-800 p-12 flex-col justify-between relative overflow-hidden">
         <div className="absolute inset-0 bg-black/10" />
-        {/* Asegúrate de tener bg-grid-pattern definido en tu index.css o tailwind.config.js */}
         <div className="absolute inset-0 opacity-10" /> 
 
         <div className="relative z-10">
@@ -101,11 +94,10 @@ export default function LoginPage({ onSwitchToRegister }: LoginPageProps) {
         </div>
       </div>
 
-      {/* Lado derecho - Formulario MODERNIZADO */}
+      {/* Lado derecho - Formulario */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md">
           
-          {/* Contenedor del Formulario - MEJORA EN BORDES Y SOMBRA */}
           <div className="bg-white rounded-3xl shadow-2xl p-10 border border-slate-100">
             
             {/* Logo mobile */}
@@ -115,7 +107,7 @@ export default function LoginPage({ onSwitchToRegister }: LoginPageProps) {
               </div>
             </div>
 
-            {/* Cabecera - MEJORA EN FUENTE Y ESPACIADO */}
+            {/* Cabecera */}
             <div className="mb-10">
               <h2 className="text-4xl font-extrabold text-slate-900 mb-2">Bienvenido</h2>
               <p className="text-slate-500">Inicia sesión en tu cuenta</p>
@@ -141,10 +133,9 @@ export default function LoginPage({ onSwitchToRegister }: LoginPageProps) {
                 placeholder="Contraseña"
                 icon={Lock}
                 required
-                minLength={6}
               />
 
-              {/* Checkbox y Olvidaste Contraseña - MEJORA EN INTERACCIÓN */}
+              {/* Checkbox y Olvidaste Contraseña */}
               <div className="flex items-center justify-between text-sm">
                 <label className="flex items-center gap-2 cursor-pointer select-none">
                   <input
@@ -166,7 +157,7 @@ export default function LoginPage({ onSwitchToRegister }: LoginPageProps) {
                 </button>
               </div>
 
-              {/* Alertas - MEJORA EN BORDES Y ANILLO */}
+              {/* Alertas */}
               {error && (
                 <div className="bg-red-50 border border-red-300 text-red-800 px-4 py-3 rounded-xl flex items-start gap-2 ring-1 ring-red-100">
                   <AlertCircle size={20} className="flex-shrink-0 mt-0.5" />
@@ -186,16 +177,10 @@ export default function LoginPage({ onSwitchToRegister }: LoginPageProps) {
               </Button>
             </form>
 
-            <div className="mt-6 text-center">
-              <p className="text-slate-600 text-sm">
-                ¿No tienes una cuenta?{' '}
-                <button
-                  onClick={onSwitchToRegister}
-                  className="text-blue-600 hover:text-blue-700 font-semibold inline-flex items-center gap-1 hover:gap-2 transition-all"
-                >
-                  Regístrate gratis
-                  <ArrowRight size={16} className="transition-transform" />
-                </button>
+            {/* Nota para contactar al administrador */}
+            <div className="mt-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
+              <p className="text-slate-600 text-sm text-center">
+                Si necesitas acceso al sistema, contacta con el administrador para obtener tus credenciales.
               </p>
             </div>
           </div>
