@@ -1,35 +1,53 @@
+import 'dotenv/config'; 
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
-import usersRouter from './routes/users.js';
-
-dotenv.config();
+import usersRouter from './routes/users.js'; 
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3001; 
 
-// Middlewares
-app.use(cors());
+// ===================================
+// Middlewares (GLOBALES)
+// ===================================
+
+
+app.use(cors()); 
 app.use(express.json());
 
-// Health check
+// ===================================
+// Rutas
+// ===================================
+
+// Ruta de prueba simple para verificar que el servidor está activo
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Server is running' });
+    res.json({ status: 'ok', message: 'Server is running' });
 });
 
-// Routes
 app.use('/api/users', usersRouter);
 
-// Error handler
+// ===================================
+// Manejador de Errores (Error Handler)
+// ===================================
+
+
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ 
-    success: false, 
-    message: 'Internal server error',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
+    console.error('SERVER ERROR STACK:', err.stack);
+    
+    const errorMessage = process.env.NODE_ENV === 'development' 
+        ? err.message 
+        : 'Internal server error';
+
+    res.status(err.status || 500).json({ 
+        success: false, 
+        message: 'Internal server error',
+        error: errorMessage
+    });
 });
 
+// ===================================
+// Inicio del Servidor
+// ===================================
+
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`🚀 Server running on port ${PORT}`);
 });

@@ -1,4 +1,3 @@
-// src/services/userManagementService.ts
 import { supabase } from '../lib/supabaseClient';
 
 export interface UserWithRole {
@@ -9,71 +8,196 @@ export interface UserWithRole {
   last_sign_in_at?: string;
 }
 
+// URL del backend - cambiar en producción
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+
+// Helper para obtener el token de autenticación
+async function getAuthToken(): Promise<string | null> {
+  const { data: { session } } = await supabase.auth.getSession();
+  return session?.access_token || null;
+}
+
 export const userManagementService = {
+  // Obtener todos los usuarios con sus roles (solo admins)
   async getAllUsers(): Promise<{ success: boolean; users?: UserWithRole[]; message: string }> {
     try {
-      const { data: roles, error: rolesError } = await supabase.from('user_roles').select('*');
-      if (rolesError) throw rolesError;
+      const token = await getAuthToken();
+      
+      if (!token) {
+        return {
+          success: false,
+          message: 'No estás autenticado'
+        };
+      }
 
-      const usersWithRoles: UserWithRole[] =
-        roles?.map((roleData: any) => ({
-          id: roleData.user_id,
-          email: 'usuario@ejemplo.com', // TODO: completar con RPC para emails reales
-          role: roleData.role,
-          created_at: roleData.created_at,
-          last_sign_in_at: undefined,
-        })) || [];
+      const response = await fetch(`${API_URL}/users`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
 
-      return { success: true, users: usersWithRoles, message: 'Usuarios obtenidos correctamente' };
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Error al obtener usuarios');
+      }
+
+      return data;
     } catch (error: any) {
       console.error('Error getting users:', error);
-      return { success: false, message: error.message || 'Error al obtener usuarios' };
+      return {
+        success: false,
+        message: error.message || 'Error al obtener usuarios'
+      };
     }
   },
 
-  // ⚠️ Parámetros no usados -> prefijo _
-  async createUser(
-    _email: string,
-    _password: string,
-    _role: 'admin' | 'trabajador'
-  ): Promise<{ success: boolean; message: string; userId?: string }> {
-    return {
-      success: false,
-      message:
-        'Por favor, crea usuarios desde el Dashboard de Supabase en Authentication > Users. Después podrás asignarles el rol aquí.',
-    };
+  // Crear nuevo usuario (solo admins)
+  async createUser(email: string, password: string, role: 'admin' | 'trabajador'): Promise<{ success: boolean; message: string; userId?: string }> {
+    try {
+      const token = await getAuthToken();
+      
+      if (!token) {
+        return {
+          success: false,
+          message: 'No estás autenticado'
+        };
+      }
+
+      const response = await fetch(`${API_URL}/users`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password, role }),
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Error al crear usuario');
+      }
+
+      return data;
+    } catch (error: any) {
+      console.error('Error creating user:', error);
+      return {
+        success: false,
+        message: error.message || 'Error al crear usuario'
+      };
+    }
   },
 
+  // Actualizar rol de usuario (solo admins)
   async updateUserRole(userId: string, newRole: 'admin' | 'trabajador'): Promise<{ success: boolean; message: string }> {
     try {
-      const { error } = await supabase.from('user_roles').update({ role: newRole }).eq('user_id', userId);
-      if (error) throw error;
-      return { success: true, message: 'Rol actualizado correctamente' };
+      const token = await getAuthToken();
+      
+      if (!token) {
+        return {
+          success: false,
+          message: 'No estás autenticado'
+        };
+      }
+
+      const response = await fetch(`${API_URL}/users/${userId}/role`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ role: newRole }),
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Error al actualizar rol');
+      }
+
+      return data;
     } catch (error: any) {
       console.error('Error updating role:', error);
-      return { success: false, message: error.message || 'Error al actualizar rol' };
+      return {
+        success: false,
+        message: error.message || 'Error al actualizar rol'
+      };
     }
   },
 
+  // Eliminar usuario (solo admins)
   async deleteUser(userId: string): Promise<{ success: boolean; message: string }> {
     try {
-      const { error } = await supabase.from('user_roles').delete().eq('user_id', userId);
-      if (error) throw error;
-      return {
-        success: true,
-        message: 'Rol eliminado. Elimina el usuario desde Supabase Dashboard > Authentication',
-      };
+      const token = await getAuthToken();
+      
+      if (!token) {
+        return {
+          success: false,
+          message: 'No estás autenticado'
+        };
+      }
+
+      const response = await fetch(`${API_URL}/users/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Error al eliminar usuario');
+      }
+
+      return data;
     } catch (error: any) {
       console.error('Error deleting user:', error);
-      return { success: false, message: error.message || 'Error al eliminar usuario' };
+      return {
+        success: false,
+        message: error.message || 'Error al eliminar usuario'
+      };
     }
   },
 
-  // ⚠️ Parámetros no usados -> prefijo _
-  async updateUserPassword(_userId: string, _newPassword: string): Promise<{ success: boolean; message: string }> {
-    return {
-      success: false,
-      message: 'Cambia la contraseña desde Supabase Dashboard > Authentication > Users',
-    };
-  },
+  // Cambiar contraseña de usuario (solo admins)
+  async updateUserPassword(userId: string, newPassword: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const token = await getAuthToken();
+      
+      if (!token) {
+        return {
+          success: false,
+          message: 'No estás autenticado'
+        };
+      }
+
+      const response = await fetch(`${API_URL}/users/${userId}/password`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password: newPassword }),
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Error al actualizar contraseña');
+      }
+
+      return data;
+    } catch (error: any) {
+      console.error('Error updating password:', error);
+      return {
+        success: false,
+        message: error.message || 'Error al actualizar contraseña'
+      };
+    }
+  }
 };

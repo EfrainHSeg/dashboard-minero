@@ -20,8 +20,7 @@ export default function UserList({ users, onDeleteUser, onUpdateRole }: UserList
     });
   }
 
-  function handleRoleChange(userId: string, currentRole: 'admin' | 'trabajador') {
-    const newRole = currentRole === 'admin' ? 'trabajador' : 'admin';
+  function handleRoleChange(userId: string, newRole: 'admin' | 'trabajador') {
     onUpdateRole(userId, newRole);
     setEditingUserId(null);
   }

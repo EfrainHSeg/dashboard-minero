@@ -24,8 +24,6 @@ export default function LoginPage() {
 
     if (result.success) {
       setSuccess(result.message || 'Inicio de sesión exitoso.');
-      // Aquí puedes navegar al dashboard si lo deseas:
-      // setTimeout(() => nav('/', { replace: true }), 500);
     } else {
       setError(result.message || 'No se pudo iniciar sesión.');
     }
@@ -134,28 +132,7 @@ export default function LoginPage() {
                 icon={Lock}
                 required
               />
-
-              {/* Checkbox y Olvidaste Contraseña */}
-              <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center gap-2 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" 
-                    checked={remember}
-                    onChange={(e) => setRemember(e.target.checked)}
-                  />
-                  <span className="text-slate-600">Recordarme</span>
-                </label>
-
-                <button
-                  type="button"
-                  onClick={handleForgotPassword}
-                  className="text-blue-600 hover:text-blue-700 font-semibold underline-offset-4 hover:underline transition-all"
-                  disabled={loading}
-                >
-                  ¿Olvidaste tu contraseña?
-                </button>
-              </div>
+            
 
               {/* Alertas */}
               {error && (
