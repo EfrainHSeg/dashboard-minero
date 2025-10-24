@@ -14,6 +14,9 @@ import {
 import { motion } from "framer-motion";
 import AdminPanel from "../components/AdminPanel";
 
+import Calandrias from "./Calandrias";
+import Summary from "./Summary";
+
 type Tab = "home" | "calandrias" | "summary";
 
 interface DashboardProps {
@@ -60,11 +63,10 @@ export default function Dashboard({ userName, userId }: DashboardProps) {
                   {userName}
                   {!roleLoading && role && (
                     <span
-                      className={`ml-2 px-1.5 py-[2px] align-middle rounded text-[10px] font-semibold ${
-                        isAdmin
+                      className={`ml-2 px-1.5 py-[2px] align-middle rounded text-[10px] font-semibold ${isAdmin
                           ? "bg-purple-100 text-purple-700"
                           : "bg-sky-100 text-sky-700"
-                      }`}
+                        }`}
                     >
                       {isAdmin ? "Admin" : "Trabajador"}
                     </span>
@@ -114,9 +116,8 @@ export default function Dashboard({ userName, userId }: DashboardProps) {
           <div className="px-2">
             <button
               onClick={() => setShowAdminPanel(true)}
-              className={`w-full inline-flex items-center justify-center gap-2 px-3 py-2 text-sm rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-colors ${
-                collapsed ? "justify-center" : ""
-              }`}
+              className={`w-full inline-flex items-center justify-center gap-2 px-3 py-2 text-sm rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-colors ${collapsed ? "justify-center" : ""
+                }`}
               title={collapsed ? "Administración" : ""}
             >
               <Settings size={16} />
@@ -131,9 +132,8 @@ export default function Dashboard({ userName, userId }: DashboardProps) {
             onClick={handleLogout}
             disabled={loading}
             className={`w-full inline-flex items-center gap-2 px-3 py-2 text-sm rounded-lg
-                        bg-slate-100 text-slate-700 hover:bg-slate-200 ring-1 ring-slate-200 transition-colors disabled:opacity-50 ${
-                          collapsed ? "justify-center" : "justify-center"
-                        }`}
+                        bg-slate-100 text-slate-700 hover:bg-slate-200 ring-1 ring-slate-200 transition-colors disabled:opacity-50 ${collapsed ? "justify-center" : "justify-center"
+              }`}
             title={collapsed ? "Salir" : ""}
           >
             <LogOut size={16} />
@@ -144,21 +144,13 @@ export default function Dashboard({ userName, userId }: DashboardProps) {
 
       {/* Main */}
       <main className="flex-1 p-6">
-        {/* Pon aquí tus secciones reales (dejamos placeholders) */}
+        {active === "calandrias" && <Calandrias />}
+        {active === "summary" && <Summary />}
         {active === "home" && (
-          <Section title="Inicio" hint="Resumen general">
-            <EmptyCopy text="Aquí mostraremos métricas globales cuando conectemos datos." />
-          </Section>
-        )}
-        {active === "calandrias" && (
-          <Section title="Calandrias" hint="Registro y monitoreo">
-            <EmptyCopy text="Próximo paso: formulario de ingreso y tabla en tiempo real." />
-          </Section>
-        )}
-        {active === "summary" && (
-          <Section title="Summary" hint="Consolidado general">
-            <EmptyCopy text="Aquí verás totales y comparativas por áreas." />
-          </Section>
+          <div className="bg-white rounded-2xl shadow-md border border-slate-200 p-6">
+            <h1 className="text-[22px] font-bold text-slate-900">Inicio</h1>
+            <p className="text-sm text-slate-500">Resumen general (placeholder).</p>
+          </div>
         )}
       </main>
     </div>
