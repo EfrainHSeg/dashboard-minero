@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Mail, Lock, TrendingUp, AlertCircle } from 'lucide-react';
-import { authService } from '../services/authService'; 
+import { authService } from '../services/authService';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 
@@ -10,7 +10,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [remember, setRemember] = useState(false);
 
   const year = new Date().getFullYear();
 
@@ -31,27 +30,13 @@ export default function LoginPage() {
     setLoading(false);
   }
 
-  async function handleForgotPassword() {
-    if (!email) {
-      setError('Ingresa tu correo para enviarte el enlace de recuperación.');
-      return;
-    }
-    setLoading(true);
-    setError('');
-    setSuccess('');
-    
-    const r = await authService.sendReset(email);
-    r.success ? setSuccess(r.message) : setError(r.message);
-    setLoading(false);
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex">
-      
+
       {/* Lado izquierdo - Branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 to-blue-800 p-12 flex-col justify-between relative overflow-hidden">
         <div className="absolute inset-0 bg-black/10" />
-        <div className="absolute inset-0 opacity-10" /> 
+        <div className="absolute inset-0 opacity-10" />
 
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-8">
@@ -95,9 +80,9 @@ export default function LoginPage() {
       {/* Lado derecho - Formulario */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md">
-          
+
           <div className="bg-white rounded-3xl shadow-2xl p-10 border border-slate-100">
-            
+
             {/* Logo mobile */}
             <div className="lg:hidden flex items-center justify-center mb-6">
               <div className="bg-blue-600 w-14 h-14 rounded-xl flex items-center justify-center">
@@ -112,7 +97,7 @@ export default function LoginPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-              
+
               <Input
                 type="email"
                 label="Correo Electrónico"
@@ -132,7 +117,7 @@ export default function LoginPage() {
                 icon={Lock}
                 required
               />
-            
+
 
               {/* Alertas */}
               {error && (
