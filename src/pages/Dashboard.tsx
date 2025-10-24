@@ -64,8 +64,8 @@ export default function Dashboard({ userName, userId }: DashboardProps) {
                   {!roleLoading && role && (
                     <span
                       className={`ml-2 px-1.5 py-[2px] align-middle rounded text-[10px] font-semibold ${isAdmin
-                          ? "bg-purple-100 text-purple-700"
-                          : "bg-sky-100 text-sky-700"
+                        ? "bg-purple-100 text-purple-700"
+                        : "bg-sky-100 text-sky-700"
                         }`}
                     >
                       {isAdmin ? "Admin" : "Trabajador"}
@@ -191,30 +191,4 @@ function SideItem({
   );
 }
 
-function Section({
-  title,
-  hint,
-  children,
-}: {
-  title: string;
-  hint?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="bg-white rounded-2xl shadow-md border border-slate-200 p-6">
-      <div className="mb-2">
-        <h1 className="text-[22px] font-bold text-slate-900">{title}</h1>
-        {hint && <p className="text-sm text-slate-500">{hint}</p>}
-      </div>
-      {children}
-    </div>
-  );
-}
 
-function EmptyCopy({ text }: { text: string }) {
-  return (
-    <div className="rounded-xl border border-dashed border-slate-300 p-6 text-sm text-slate-600 bg-slate-50/60">
-      {text}
-    </div>
-  );
-}
